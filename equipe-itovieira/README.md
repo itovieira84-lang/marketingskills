@@ -14,6 +14,7 @@ Arquitetura aprovada a partir do doc "Equipe de marketing do @itovieira — arqu
 | `agentes/*/SKILL.md` | Uma skill por agente |
 | `modelos/carrossel.html` | Modelo do carrossel no padrão visual |
 | `scripts/render-carrossel.mjs` | Renderiza o carrossel em PNG 1080×1350 |
+| `entrada/` | Fotos (`fotos/`) e vídeos brutos (`videos/`) do dia a dia |
 | `pacotes/AAAA-MM-DD/` | Saída de cada dia (pautas, brief, slides, vídeo, legendas, status) |
 
 ## Os agentes
@@ -59,3 +60,13 @@ Outros modos possíveis, se ele pedir: `APROVACAO=total` (nada sai sem ok) e `AP
 | Comentários e directs | Navegador logado do italo (Claude in Chrome) | Depende do computador ligado |
 | Voz dele | VoiceStudio local | Falta amostra de áudio |
 | Imagem dele em outro cenário, lip sync | Open-Higgsfield-AI (Muapi.ai) | Falta chave Muapi |
+
+## Referências fixas do Ítalo
+
+Rosto, voz e gestos padrão ficam na pasta compartilhada do projeto `/mnt/project-files/italo-referencias/`
+(no PC do italo: `V:\cloudecode\italo-referencias`):
+
+- `rosto/` — fotos de rosto; principal: `rosto-estudio-fundo-escuro.png`.
+- `video/` — vídeo de movimentos e gestos (só no PC, 147 MB).
+- `voz/` — trecho limpo de 15 s + transcrição para clonagem; perfil de voz "Ítalo Vieira" no VoiceStudio.
+- `README.md` — descrição do rosto e dos gestos para usar em prompts.

@@ -30,6 +30,6 @@ Você monta o carrossel exatamente no padrão de `../../marca.md` (carvão, arei
 
 ## Regras
 
-- Fotos só de `entrada/fotos/` (reais do Ítalo). Se não houver foto adequada, use slide só de texto, nunca banco de imagem.
+- Fotos só de `entrada/fotos/` ou `italo-referencias/rosto/` (reais do Ítalo; ver "Referências fixas" no `README.md`). Se não houver foto adequada, use slide só de texto, nunca banco de imagem.
 - Alternativa: Canva, se o italo conectar e houver um modelo de marca lá.
 - Nunca gere imagem do rosto dele com IA para carrossel.
