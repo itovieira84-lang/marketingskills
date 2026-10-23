@@ -19,6 +19,8 @@
 - Datas especiais (palestras, lançamentos das empresas, datas da família) substituem o slot de Bastidores ou Vida real da semana.
 - Formato de vídeo padrão: 30–60s, gancho nos 2 primeiros segundos, legenda queimada, CTA falado no fim.
 
+- Domingo: o Copy escreve os roteiros de vídeo do Modo B da semana inteira, para a narração rodar em lote de madrugada no VoiceStudio (CPU, lento).
+
 ## Agenda fixa conhecida
 
 - 24/10/2026: palestra no Estética Lucrativa Experience (bom material de bastidores).

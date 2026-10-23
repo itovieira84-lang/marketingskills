@@ -22,7 +22,8 @@ Você entrega um reel 9:16 (1080×1920), 30 a 60 s, com legenda queimada no padr
 
 Só quando as conexões existirem (ver `README.md`):
 
-1. **Voz:** gere a fala do roteiro com o perfil de voz "Ítalo Vieira" no VoiceStudio (máquina do italo; skill `voicestudio`). Amostra e transcrição em `italo-referencias/voz/`.
+1. **Voz:** gere a fala com o perfil "Ítalo Vieira" (ID `9c568ca2`, engine OmniVoice, português) no VoiceStudio do PC do italo (`localhost:3900`, skill `voicestudio`). Amostra e transcrição em `italo-referencias/voz/`.
+   - **Roda só em CPU: uma frase curta leva mais de 10 minutos.** Nunca gere narração na hora. Os roteiros do Modo B da semana são escritos no domingo e narrados em lote durante a madrugada, frase por frase, salvando em `pacotes/<dia>/video/voz/`. Se a narração de um dia não estiver pronta às 19h da véspera, o vídeo cai para Modo A ou roteiro para gravar.
 2. **Imagem:** a partir de `italo-referencias/rosto/rosto-estudio-fundo-escuro.png` (e da descrição em `italo-referencias/README.md`), gere o Ítalo no cenário e na roupa do brief, preservando rosto, cabelo, barba e traços (Open-Higgsfield-AI via Muapi, modelo de imagem com referência).
 3. **Movimento e boca:** lip sync com o áudio (Studio Lip Sync do Open-Higgsfield: Infinite Talk ou LTX Lipsync).
 4. Monte com legenda e capa como no Modo A.
