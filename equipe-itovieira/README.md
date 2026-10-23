@@ -58,7 +58,7 @@ Outros modos possíveis, se ele pedir: `APROVACAO=total` (nada sai sem ok) e `AP
 | Agendar/publicar carrossel e reel, métricas | Metricool (conta profissional do IG) | Conta existe, Instagram **não conectado** |
 | Alternativa para reel + insights | vidIQ | Instagram **não conectado** |
 | Comentários e directs | Navegador logado do italo (Claude in Chrome) | Depende do computador ligado |
-| Voz dele | VoiceStudio local | Falta amostra de áudio |
+| Voz dele | VoiceStudio local | Amostra pronta em `italo-referencias/voz/`; perfil "Ítalo Vieira" em criação |
 | Imagem dele em outro cenário, lip sync | Open-Higgsfield-AI (Muapi.ai) | Falta chave Muapi |
 
 ## Referências fixas do Ítalo
