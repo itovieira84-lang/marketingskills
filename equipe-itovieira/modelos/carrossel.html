@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Carrossel @itovieira</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Instrument+Serif:ital@1&display=block">
+<style>
+  :root { --carvao:#141210; --areia:#EFE9E1; --offwhite:#F5F1EA; --cobre:#D9822B; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#000; font-family:Manrope, Inter, sans-serif; }
+  .slide { width:1080px; height:1350px; position:relative; overflow:hidden; padding:96px 88px;
+           display:flex; flex-direction:column; justify-content:flex-end; }
+  .escuro { background:var(--carvao); color:var(--areia); }
+  .claro { background:var(--offwhite); color:var(--carvao); }
+  .foto { position:absolute; inset:0; background-size:cover; background-position:center; }
+  .foto::after { content:""; position:absolute; inset:0;
+                 background:linear-gradient(180deg, rgba(20,18,16,0) 30%, rgba(20,18,16,.92) 78%); }
+  .conteudo { position:relative; }
+  h1 { font-weight:800; font-size:92px; line-height:1.02; letter-spacing:-2px; }
+  .texto h1 { font-size:68px; }
+  p { font-weight:500; font-size:40px; line-height:1.35; margin-top:36px; opacity:.88; }
+  em { font-family:"Instrument Serif", Georgia, serif; font-style:italic; font-weight:400;
+       color:var(--cobre); letter-spacing:0; }
+  .topo { position:absolute; top:72px; left:88px; right:88px; display:flex; justify-content:space-between;
+          font-weight:700; font-size:24px; letter-spacing:3px; opacity:.6; }
+  .assinatura { margin-top:64px; font-weight:800; font-size:28px; letter-spacing:6px; }
+  .final { justify-content:center; }
+</style>
+</head>
+<body>
+<main id="carrossel"></main>
+<script>
+  // Recebe { slides:[{tipo,titulo,corpo,destaque,foto}], tema } e desenha um .slide por item.
+  function escapar(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function destacar(texto, palavra) {
+    const t = escapar(texto);
+    if (!palavra) return t;
+    const p = escapar(palavra);
+    const i = t.toLowerCase().indexOf(p.toLowerCase());
+    return i < 0 ? t : t.slice(0, i) + '<em>' + t.slice(i, i + p.length) + '</em>' + t.slice(i + p.length);
+  }
+  window.renderCarrossel = function ({ slides, tema = 'escuro' }) {
+    const total = slides.length;
+    document.getElementById('carrossel').innerHTML = slides.map((s, i) => {
+      const fundo = s.tema || (s.foto ? 'escuro' : tema);
+      return `<section class="slide ${fundo} ${s.tipo || 'texto'}">
+        ${s.foto ? `<div class="foto" style="background-image:url('${escapar(s.foto)}')"></div>` : ''}
+        <div class="topo"><span>@ITOVIEIRA</span><span>${i + 1}/${total}</span></div>
+        <div class="conteudo">
+          <h1>${destacar(s.titulo, s.destaque)}</h1>
+          ${s.corpo ? `<p>${escapar(s.corpo)}</p>` : ''}
+          ${s.tipo === 'final' ? '<div class="assinatura">— ÍTALO VIEIRA</div>' : ''}
+        </div>
+      </section>`;
+    }).join('');
+  };
+</script>
+</body>
+</html>

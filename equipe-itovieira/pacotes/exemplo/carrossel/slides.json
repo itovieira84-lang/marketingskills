@@ -1,0 +1,9 @@
+{
+  "tema": "escuro",
+  "slides": [
+    { "tipo": "capa", "titulo": "Quem distribui ganha o jogo. Quem é difícil de copiar ganha o futuro.", "destaque": "difícil de copiar" },
+    { "tipo": "texto", "titulo": "Preço baixo se copia em uma semana.", "corpo": "O concorrente só precisa aceitar ganhar menos que você.", "destaque": "uma semana" },
+    { "tipo": "texto", "tema": "claro", "titulo": "Relação com o cliente leva anos.", "corpo": "E é isso que ninguém consegue tirar de você.", "destaque": "anos" },
+    { "tipo": "final", "titulo": "Salva para reler quando bater a vontade de baixar o preço.", "destaque": "reler" }
+  ]
+}
