@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Carrossel @itovieira</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Instrument+Serif:ital@1&display=block">
+<style>
+  /* Grid fixo: 1080x1350, margem 88px, cabeçalho e rodapé em linhas fixas,
+     título sempre começando na mesma altura. Nada se move de um slide para outro. */
+  :root { --carvao:#141210; --areia:#EFE9E1; --offwhite:#F5F1EA; --cobre:#D9822B;
+          --m:88px; --topo-titulo:332px; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#000; font-family:Manrope, Inter, sans-serif; }
+  .slide { width:1080px; height:1350px; position:relative; overflow:hidden; }
+  .escuro { background:var(--carvao); color:var(--areia); --linha:rgba(239,233,225,.22); }
+  .claro { background:var(--offwhite); color:var(--carvao); --linha:rgba(20,18,16,.18); }
+
+  .cabecalho, .rodape { position:absolute; left:var(--m); right:var(--m); display:flex;
+          justify-content:space-between; align-items:center;
+          font-weight:700; font-size:22px; letter-spacing:4px; text-transform:uppercase; }
+  .cabecalho { top:var(--m); height:40px; border-bottom:2px solid var(--linha); padding-bottom:20px; box-sizing:content-box; }
+  .rodape { bottom:var(--m); height:40px; border-top:2px solid var(--linha); padding-top:20px; box-sizing:content-box; }
+  .cabecalho span:last-child, .rodape .seta { opacity:.6; }
+  .rodape .assinatura { letter-spacing:6px; }
+
+  .conteudo { position:absolute; left:var(--m); right:var(--m); top:var(--topo-titulo); }
+  .kicker { font-weight:700; font-size:24px; letter-spacing:4px; text-transform:uppercase;
+            color:var(--cobre); margin-bottom:40px; }
+  h1 { font-weight:800; font-size:var(--fs, 88px); line-height:1.06; letter-spacing:-0.02em;
+       text-wrap:balance; }
+  p { font-weight:500; font-size:40px; line-height:1.4; margin-top:48px; max-width:820px;
+      opacity:.86; text-wrap:pretty; }
+  em { font-family:"Instrument Serif", Georgia, serif; font-style:italic; font-weight:400;
+       color:var(--cobre); letter-spacing:0; }
+
+  /* Capa: título maior; com foto, o bloco de texto encosta no rodapé, mesmas margens. */
+  .capa h1 { --fs:96px; }
+  .com-foto .conteudo { top:auto; bottom:calc(var(--m) + 60px + 64px); }
+  .foto { position:absolute; left:0; right:0; top:0; height:900px; background-size:cover; background-position:center 18%; }
+  .foto::after { content:""; position:absolute; inset:0;
+                 background:linear-gradient(180deg, rgba(20,18,16,.6) 0%, rgba(20,18,16,0) 20%,
+                                            rgba(20,18,16,0) 55%, var(--carvao) 100%); }
+  .com-foto .cabecalho { border-bottom-color:transparent; }
+  .final h1 { --fs:80px; }
+</style>
+</head>
+<body>
+<main id="carrossel"></main>
+<script>
+  // Recebe { slides:[{tipo,kicker,titulo,corpo,destaque,foto,tema}], tema } e desenha um .slide por item.
+  function escapar(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function destacar(texto, palavra) {
+    const t = escapar(texto);
+    if (!palavra) return t;
+    const p = escapar(palavra);
+    const i = t.toLowerCase().indexOf(p.toLowerCase());
+    return i < 0 ? t : t.slice(0, i) + '<em>' + t.slice(i, i + p.length) + '</em>' + t.slice(i + p.length);
+  }
+  const dois = n => String(n).padStart(2, '0');
+  window.renderCarrossel = function ({ slides, tema = 'escuro' }) {
+    const total = slides.length;
+    document.getElementById('carrossel').innerHTML = slides.map((s, i) => {
+      const fundo = s.foto ? 'escuro' : (s.tema || tema);
+      const ultimo = i === total - 1;
+      return `<section class="slide ${fundo} ${s.tipo || 'texto'} ${s.foto ? 'com-foto' : ''}">
+        ${s.foto ? `<div class="foto" style="background-image:url('${escapar(s.foto)}')"></div>` : ''}
+        <header class="cabecalho"><span>@itovieira</span><span>${dois(i + 1)} / ${dois(total)}</span></header>
+        <div class="conteudo">
+          ${s.kicker ? `<div class="kicker">${escapar(s.kicker)}</div>` : ''}
+          <h1>${destacar(s.titulo, s.destaque)}</h1>
+          ${s.corpo ? `<p>${escapar(s.corpo)}</p>` : ''}
+        </div>
+        <footer class="rodape"><span class="assinatura">— Ítalo Vieira</span><span class="seta">${ultimo ? 'Salve e compartilhe' : 'Arraste →'}</span></footer>
+      </section>`;
+    }).join('');
+    // Reduz o título até caber entre o topo do conteúdo e o rodapé, sem nunca sair do grid.
+    document.querySelectorAll('.slide').forEach(sl => {
+      const c = sl.querySelector('.conteudo'), h = sl.querySelector('h1'), r = sl.querySelector('.rodape');
+      let fs = parseFloat(getComputedStyle(h).fontSize);
+      const comFoto = sl.classList.contains('com-foto');
+      const estourou = () => comFoto
+        ? c.getBoundingClientRect().top < 760
+        : c.getBoundingClientRect().bottom > r.getBoundingClientRect().top - 64;
+      while (estourou() && fs > 44) {
+        fs -= 2; h.style.setProperty('--fs', fs + 'px');
+      }
+    });
+  };
+</script>
+</body>
+</html>
