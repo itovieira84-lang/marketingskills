@@ -28,6 +28,16 @@ Você monta o carrossel exatamente no padrão de `../../marca.md` (carvão, arei
 }
 ```
 
+## Grid (não mexer)
+
+- Formato 1080×1350, margem de 88 px nos quatro lados.
+- Cabeçalho fixo no topo (@ITOVIEIRA à esquerda, `01 / 07` à direita, filete embaixo).
+- Rodapé fixo (— ÍTALO VIEIRA à esquerda, "Arraste →" ou "Salve e compartilhe" à direita, filete em cima).
+- Título sempre começa na mesma altura (332 px) e alinhado à esquerda; kicker em cobre acima dele.
+- Capa com foto: foto no topo, texto no terço de baixo, sem sobrepor o rosto.
+- O modelo reduz o título sozinho se não couber. Se ficar abaixo de 56 px, o texto está longo demais: volte ao Copy.
+- Confira sempre os slides lado a lado: cabeçalho, título e rodapé devem cair na mesma linha em todos.
+
 ## Regras
 
 - Fotos só de `entrada/fotos/` ou `italo-referencias/rosto/` (reais do Ítalo; ver "Referências fixas" no `README.md`). Se não houver foto adequada, use slide só de texto, nunca banco de imagem.
