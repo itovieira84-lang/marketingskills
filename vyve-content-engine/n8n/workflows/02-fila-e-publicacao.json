@@ -1,0 +1,160 @@
+{
+  "name": "VYVE · Processar fila e publicar o que venceu",
+  "nodes": [
+    {
+      "id": "25f38b02-e974-466f-9eb1-0d30d684aaa8",
+      "name": "A cada 15 min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "570a58df-f697-4d4f-ab49-cad4411e8165",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "534a7730-1597-415c-8e29-60ed4bb23f70",
+              "name": "base_url",
+              "value": "https://SEU-PAINEL-VYVE",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "14a57483-47f4-4952-a833-3bdb3c1e6c66",
+      "name": "Processar fila",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VYVE_API",
+          "name": "VYVE API (Authorization: Bearer ...)"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.base_url }}/api/v1/queue/drain",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ maxSteps: 50 }) }}",
+        "options": {
+          "timeout": 600000
+        }
+      }
+    },
+    {
+      "id": "70d07908-7e2b-4f82-b32d-9d3a86c31a21",
+      "name": "Publicar vencidas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VYVE_API",
+          "name": "VYVE API (Authorization: Bearer ...)"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.base_url }}/api/v1/publish-due",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ dryRun: true }) }}",
+        "options": {
+          "timeout": 600000
+        }
+      }
+    },
+    {
+      "id": "91031b2a-3ced-4922-8425-98c69ef7170c",
+      "name": "Leia-me",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -260
+      ],
+      "parameters": {
+        "content": "## Fila e publicação\nProcessa a fila dos agentes (dispensável se o worker `npm run worker` estiver rodando) e verifica o que está agendado.\n\n**Começa em simulação (dryRun: true).** Troque para `false` só depois de: app da Meta aprovado, token do cliente em variável de ambiente, ig_user_id cadastrado e VYVE_PUBLIC_BASE_URL público. Mesmo assim, só sai o que uma pessoa aprovou.",
+        "width": 520,
+        "height": 220
+      }
+    }
+  ],
+  "connections": {
+    "A cada 15 min": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Processar fila",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar fila": {
+      "main": [
+        [
+          {
+            "node": "Publicar vencidas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {}
+}

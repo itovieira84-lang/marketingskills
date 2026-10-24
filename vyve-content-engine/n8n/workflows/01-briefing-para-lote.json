@@ -1,0 +1,144 @@
+{
+  "name": "VYVE · Briefing recebido vira lote",
+  "nodes": [
+    {
+      "id": "e54c7ee7-b797-45f7-a0f5-1d1cd5646f00",
+      "name": "Webhook briefing",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "c78dd467-8cc5-440f-8c41-7a659d9a8d5c",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vyve-briefing",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "32d35db0-0fcc-48b8-abb3-5b4f8bd43654",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5329ae30-4be5-4fd3-be42-557f6c5406f8",
+              "name": "base_url",
+              "value": "https://SEU-PAINEL-VYVE",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "bb8dfaba-0172-4402-ad56-5e955cafc7c5",
+      "name": "Criar lote",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VYVE_API",
+          "name": "VYVE API (Authorization: Bearer ...)"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.base_url }}/api/v1/briefings",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ clientId: $('Webhook briefing').item.json.body.clientId, title: $('Webhook briefing').item.json.body.title, theme: $('Webhook briefing').item.json.body.theme, objective: $('Webhook briefing').item.json.body.objective, body: $('Webhook briefing').item.json.body.body, mix: $('Webhook briefing').item.json.body.mix, mode: $('Webhook briefing').item.json.body.mode }) }}",
+        "options": {
+          "timeout": 600000
+        }
+      }
+    },
+    {
+      "id": "a95b3fbd-a1f5-44f7-9df1-75fe2565f370",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "24b15b56-6479-43be-b872-e4b1aab40f01",
+      "name": "Leia-me",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -260
+      ],
+      "parameters": {
+        "content": "## Briefing → lote\nRecebe POST com clientId, title, theme, objective, body, mix e mode (anthropic | claude-code | fixture).\nO VYVE devolve o lote existente se o mesmo briefing chegar duas vezes.\n\n1. Edite **Config → base_url**.\n2. Crie a credencial Header Auth: nome `Authorization`, valor `Bearer <chave criada em Configurações do painel>`.",
+        "width": 520,
+        "height": 220
+      }
+    }
+  ],
+  "connections": {
+    "Webhook briefing": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Criar lote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar lote": {
+      "main": [
+        [
+          {
+            "node": "Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {}
+}

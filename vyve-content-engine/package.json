@@ -1,0 +1,23 @@
+{
+  "name": "vyve-content-engine",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "VYVE Content Engine: um briefing vira um lote de até 30 conteúdos, com 6 agentes especializados e um orquestrador.",
+  "workspaces": ["packages/engine", "packages/video", "apps/web"],
+  "engines": { "node": ">=20.11" },
+  "scripts": {
+    "db:migrate": "tsx packages/engine/src/cli.ts db migrate",
+    "vyve": "tsx packages/engine/src/cli.ts",
+    "worker": "tsx packages/engine/src/cli.ts worker",
+    "web": "npm run dev -w apps/web",
+    "studio": "npm run studio -w packages/video",
+    "typecheck": "tsc -p packages/engine --noEmit && tsc -p apps/web --noEmit",
+    "test": "scripts/test.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3"
+  }
+}
