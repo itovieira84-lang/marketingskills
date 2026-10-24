@@ -220,7 +220,7 @@ export async function getBatch(ctx: Ctx, batchId: string) {
       batch,
       runs: await many(tx, "select id, agent, step, status, attempt, max_attempts, error, output, started_at, finished_at from vyve.agent_runs where batch_id = $1 order by created_at, step", [batchId]),
       research: await maybe(tx, "select * from vyve.research where batch_id = $1 order by created_at desc limit 1", [batchId]),
-      pieces: await many(tx, "select p.*, s.payload, s.approval as script_approval, s.id as script_id from vyve.pieces p left join vyve.scripts s on s.id = p.script_id where p.batch_id = $1 order by p.seq", [batchId]),
+      pieces: await many(tx, "select p.*, (select m.mime from vyve.media_assets m where m.id = p.preview_asset_id) as preview_mime, s.payload, s.approval as script_approval, s.id as script_id from vyve.pieces p left join vyve.scripts s on s.id = p.script_id where p.batch_id = $1 order by p.seq", [batchId]),
       logs: await many(tx, "select * from vyve.logs where batch_id = $1 order by at desc limit 200", [batchId]),
       costs: await many(tx, "select provider, model, sum(input_tokens)::int as input_tokens, sum(output_tokens)::int as output_tokens, sum(web_searches)::int as web_searches, sum(usd)::float as usd from vyve.api_costs where batch_id = $1 group by provider, model", [batchId]),
     };
@@ -233,7 +233,7 @@ export async function listBatches(ctx: Ctx) {
 
 export async function listPieces(ctx: Ctx, f: { clientId?: string; formats?: string[]; approval?: string; batchId?: string } = {}) {
   return withCtx(ctx, (tx) => many(tx,
-    `select p.*, c.name as client_name, s.payload from vyve.pieces p join vyve.clients c on c.id = p.client_id left join vyve.scripts s on s.id = p.script_id
+    `select p.*, (select m.mime from vyve.media_assets m where m.id = p.preview_asset_id) as preview_mime, c.name as client_name, s.payload from vyve.pieces p join vyve.clients c on c.id = p.client_id left join vyve.scripts s on s.id = p.script_id
       where ($1::uuid is null or p.client_id = $1) and ($2::text[] is null or p.format::text = any($2)) and ($3::text is null or p.approval = $3)
         and ($4::uuid is null or p.batch_id = $4)
       order by p.created_at desc, p.seq limit 300`, [f.clientId ?? null, f.formats ?? null, f.approval ?? null, f.batchId ?? null]));
@@ -270,7 +270,7 @@ export async function pendingResearch(ctx: Ctx) {
 
 export async function calendar(ctx: Ctx, f: { from: string; to: string; clientId?: string }) {
   return withCtx(ctx, (tx) => many(tx,
-    `select e.*, p.title, p.format, p.seq, p.preview_asset_id, c.name as client_name from vyve.calendar_entries e join vyve.pieces p on p.id = e.piece_id join vyve.clients c on c.id = e.client_id
+    `select e.*, p.title, p.format, p.seq, p.preview_asset_id, (select m.mime from vyve.media_assets m where m.id = p.preview_asset_id) as preview_mime, p.approval, c.name as client_name from vyve.calendar_entries e join vyve.pieces p on p.id = e.piece_id join vyve.clients c on c.id = e.client_id
       where e.scheduled_for between $1 and $2 and ($3::uuid is null or e.client_id = $3) order by e.scheduled_for`, [f.from, f.to, f.clientId ?? null]));
 }
 

@@ -1,7 +1,7 @@
 import { withCtx, many, maybe, type Ctx, type Tx } from "../db";
 import { recordHistory } from "./common";
 import { log } from "../logging";
-import { sha256 } from "../auth";
+import { publicMediaSig, sha256 } from "../auth";
 import { igCredentialsFromEnv, InstagramGraph } from "../integrations/instagram";
 import { config } from "../config";
 
@@ -179,7 +179,7 @@ export async function publishDue(ctx: Ctx, opts: { now?: Date; requestedBy?: str
         const integration = await maybe(tx, "select * from vyve.integrations where client_id = $1 and provider = 'instagram'", [e.client_id]);
         const ig = new InstagramGraph(igCredentialsFromEnv(integration)!, opts.fetchImpl);
         const assets = await many(tx, "select * from vyve.media_assets where id = any($1::uuid[]) order by label", [e.output_asset_ids]);
-        const pub = (a: any) => `${config.publicBaseUrl.replace(/\/$/, "")}/api/public-media/${a.id}?sig=${sha256(a.id + config.sessionSecret).slice(0, 32)}`;
+        const pub = (a: any) => `${config.publicBaseUrl.replace(/\/$/, "")}/api/public-media/${a.id}?sig=${publicMediaSig(a.id)}`;
         let containerId: string;
         if (e.format === "reel") {
           const v = assets.find((a: any) => a.mime === "video/mp4" && !a.metadata?.preview && !a.metadata?.intermediate);

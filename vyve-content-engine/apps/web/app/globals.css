@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+/* VYVE — chão de produção. Base fria e neutra; a cor forte fica só na régua
+   de etapas (IDEIA → ANÁLISE), que é a informação central do sistema. */
+@theme {
+  --font-display: var(--font-bricolage), "Bricolage Grotesque", system-ui, sans-serif;
+  --font-sans: var(--font-public), "Public Sans", system-ui, sans-serif;
+
+  --color-ink: #14162b;
+  --color-ink-2: #2a2d48;
+  --color-paper: #f2f3f6;
+  --color-surface: #ffffff;
+  --color-line: #dde0e8;
+  --color-muted: #5e6378;
+  --color-cobalt: #2b50e8;
+  --color-cobalt-dark: #1e3bb5;
+
+  --color-ok: #1f8f5f;
+  --color-warn: #a86a12;
+  --color-err: #c2413b;
+
+  --color-s1: #8a90a8; /* IDEIA */
+  --color-s2: #6f7cc2; /* PESQUISA */
+  --color-s3: #5465d6; /* ROTEIRO */
+  --color-s4: #6a4fd8; /* PRODUÇÃO */
+  --color-s5: #9a4cc4; /* REVISÃO */
+  --color-s6: #c24f9a; /* APROVAÇÃO */
+  --color-s7: #d8605f; /* AGENDAMENTO */
+  --color-s8: #d98a2f; /* PUBLICAÇÃO */
+  --color-s9: #2f9a6b; /* ANÁLISE */
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-cobalt);
+  outline-offset: 2px;
+}
+
+.fictitious {
+  background-image: repeating-linear-gradient(-45deg, #fff4d6 0 8px, #ffe9ad 8px 16px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

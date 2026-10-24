@@ -119,3 +119,14 @@ export class ForbiddenError extends Error {
 export function assertCan(ctx: Ctx, perm: Permission) {
   if (!can(ctx.role, perm)) throw new ForbiddenError(perm);
 }
+
+/** Assinatura da URL pública de mídia (a Meta baixa o arquivo por ela). HMAC com o segredo da sessão. */
+export function publicMediaSig(assetId: string): string {
+  return crypto.createHmac("sha256", config.sessionSecret).update(`public-media:${assetId}`).digest("hex").slice(0, 32);
+}
+
+export function verifyPublicMediaSig(assetId: string, sig: string | null | undefined): boolean {
+  const want = Buffer.from(publicMediaSig(assetId));
+  const got = Buffer.from(String(sig ?? ""));
+  return got.length === want.length && crypto.timingSafeEqual(got, want);
+}
