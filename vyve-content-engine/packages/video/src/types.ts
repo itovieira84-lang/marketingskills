@@ -65,3 +65,17 @@ export const FALLBACK_BRAND: BrandProps = {
   fonts: { heading: "Inter Display", body: "Inter" },
   logoUrl: null,
 };
+
+/** Reels sem fala (modo "foto + tipografia"): só fotos reais do cliente, sem rosto ou voz sintetizados. */
+export type StoryScene =
+  | { kind: "photo"; seconds: number; image: string; lead?: string; punch: string; punchSize?: number; kicker?: string; footer?: string; textAt?: "top" | "bottom"; focus?: [number, number]; zoom?: [number, number]; drift?: number; mono?: boolean }
+  | { kind: "stat"; seconds: number; value: number; suffix?: string; text: string; source: string; kicker?: string }
+  | { kind: "bar"; seconds: number; lead: string; label: string; to: number; punch: string }
+  | { kind: "list"; seconds: number; items: string[]; punch: string; kicker?: string };
+
+export type PhotoStoryProps = {
+  scenes: StoryScene[];
+  musicUrl: string | null;
+  palette: { ink: string; paper: string; accent: string };
+  brand: BrandProps;
+};

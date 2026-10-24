@@ -1,8 +1,9 @@
 import React from "react";
 import { Composition, Still } from "remotion";
 import { PieceStill } from "./compositions/PieceStill";
+import { PhotoStory, storyDurationFrames } from "./compositions/PhotoStory";
 import { EditedReel, MotionReel, motionDurationS, reelDurationS } from "./compositions/Reels";
-import { FALLBACK_BRAND, type EditedReelProps, type MotionReelProps, type StillProps } from "./types";
+import { FALLBACK_BRAND, type EditedReelProps, type MotionReelProps, type PhotoStoryProps, type StillProps } from "./types";
 
 const FPS = 30;
 
@@ -77,6 +78,21 @@ export const Root: React.FC = () => (
         width: props.size.width,
         height: props.size.height,
       })}
+    />
+    <Composition
+      id="PhotoStory"
+      component={PhotoStory}
+      fps={FPS}
+      width={1080}
+      height={1920}
+      durationInFrames={FPS * 10}
+      defaultProps={{
+        scenes: [{ kind: "list", seconds: 5, items: ["Atendimento.", "Confiança."], punch: "Isso não se copia." }],
+        musicUrl: null,
+        palette: { ink: "#141414", paper: "#EDE6DA", accent: "#B87333" },
+        brand: FALLBACK_BRAND,
+      } satisfies PhotoStoryProps}
+      calculateMetadata={({ props }) => ({ durationInFrames: storyDurationFrames(props, FPS) })}
     />
   </>
 );
