@@ -1,0 +1,8 @@
+node_modules/
+.next/
+storage/
+*.log
+.env
+.env.local
+out/
+coverage/
