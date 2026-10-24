@@ -8,13 +8,12 @@
   "engines": { "node": ">=20.11" },
   "scripts": {
     "db:migrate": "tsx packages/engine/src/cli.ts db migrate",
-    "db:seed": "tsx packages/engine/src/cli.ts db seed-demo",
     "vyve": "tsx packages/engine/src/cli.ts",
     "worker": "tsx packages/engine/src/cli.ts worker",
     "web": "npm run dev -w apps/web",
     "studio": "npm run studio -w packages/video",
     "typecheck": "tsc -p packages/engine --noEmit && tsc -p apps/web --noEmit",
-    "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts"
+    "test": "scripts/test.sh"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
