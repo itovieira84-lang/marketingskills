@@ -41,6 +41,7 @@ export async function startFileServer(): Promise<string> {
     }
   });
   await new Promise<void>((resolve) => server!.listen(0, "127.0.0.1", resolve));
+  server.unref(); // não segura o processo (CLI, testes) só por causa do servidor interno
   baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   return baseUrl;
 }
@@ -55,5 +56,6 @@ export async function stopFileServer() {
   const s = server;
   server = null;
   baseUrl = "";
+  s.closeAllConnections();
   await new Promise<void>((r) => s.close(() => r()));
 }

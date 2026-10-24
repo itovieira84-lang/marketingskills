@@ -8,8 +8,9 @@ import {
   analyzePerformance, uploadAsset, setIntegration, withCtx, many, one, absolutePath,
 } from "../packages/engine/src/index";
 import { probe } from "../packages/engine/src/media/ffmpeg";
+import { stopFileServer } from "../packages/engine/src/media/fileserver";
 
-after(() => closePool());
+after(async () => { await stopFileServer(); await closePool(); });
 
 test("lote fictício: pesquisa → aprovação → roteiros → produção real → revisão → aprovação → calendário → publicação bloqueada → análise sem dados", { timeout: 15 * 60_000 }, async () => {
   const ctx = await newTeam("E2E");
@@ -124,7 +125,7 @@ test("publicação com credenciais usa o fluxo oficial da Graph API (fetch simul
 test("orçamento estourado bloqueia a etapa antes de qualquer chamada paga", async () => {
   const ctx = await newTeam("BUDGET");
   const client = await createClient(ctx, { name: "Cliente orçamento" });
-  const b = await createBriefing(ctx, { clientId: client.id, title: "Lote caro", theme: "x", mix: { card: 1 } });
+  const b = await createBriefing(ctx, { clientId: client.id, title: "Lote caro", theme: "tema de teste", mix: { card: 1 } });
   process.env.ANTHROPIC_API_KEY = "sk-ant-teste-nao-usada";
   try {
     const { batch } = await startBatch(ctx, { briefingId: b.id, mode: "anthropic", budgetUsd: 0.0001 });
@@ -168,7 +169,7 @@ test("arquivo de vídeo corrompido: novas tentativas e depois falha, nunca 'pron
   try {
     await uploadAsset(ctx, { clientId: client.id, kind: "video", fileName: "gravacao.mp4", srcPath: bad, label: "gravação", rightsStatus: "own" });
   } finally { fs.rmSync(bad, { force: true }); }
-  const b = await createBriefing(ctx, { clientId: client.id, title: "Lote retry", theme: "x", mix: { reel: 1 } });
+  const b = await createBriefing(ctx, { clientId: client.id, title: "Lote retry", theme: "tema de teste", mix: { reel: 1 } });
   const { batch } = await startBatch(ctx, { briefingId: b.id, mode: "fixture" });
   await settle(10);
   const d = (await getBatch(ctx, batch.id))!;

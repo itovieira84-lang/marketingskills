@@ -91,7 +91,14 @@ export async function speechSegments(file: string, opts: { noiseDb?: number; min
  * Escolhe janelas de corte de ~targetS segundos que começam no início de uma
  * fala e terminam num silêncio (evita cortar palavra no meio).
  */
-export function pickClipWindows(speech: Array<{ start: number; end: number }>, targetS: number, maxClips: number): Array<{ start: number; end: number }> {
+export function pickClipWindows(input: Array<{ start: number; end: number }>, targetS: number, maxClips: number): Array<{ start: number; end: number }> {
+  // Fala contínua (sem pausas detectáveis) vira um único trecho longo: divide em blocos do tamanho
+  // pedido para que cada Reels do lote use uma parte diferente do vídeo.
+  const speech: Array<{ start: number; end: number }> = [];
+  for (const seg of input) {
+    if (seg.end - seg.start <= targetS * 1.35) { speech.push(seg); continue; }
+    for (let t = seg.start; t < seg.end - 1; t += targetS) speech.push({ start: t, end: Math.min(seg.end, t + targetS) });
+  }
   const clips: Array<{ start: number; end: number }> = [];
   let i = 0;
   while (i < speech.length && clips.length < maxClips) {

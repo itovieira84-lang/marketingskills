@@ -28,6 +28,9 @@ export async function loadProductionAssets(tx: Tx, clientId: string): Promise<Pr
     `select a.*, c.scope as consent_scope, c.revoked_at as consent_revoked
        from vyve.media_assets a left join vyve.consents c on c.id = a.consent_id
       where a.client_id = $1 and a.kind <> 'render' order by a.created_at`, [clientId]);
+  // Vídeo com a fala de uma pessoa também precisa de consentimento de voz ativo do cliente
+  // (o ativo guarda um consentimento; o de voz é conferido aqui).
+  const voiceConsent = await maybe(tx, "select 1 from vyve.consents where client_id = $1 and scope = 'voice' and revoked_at is null limit 1", [clientId]);
   const out: ProductionAssets = { logo: null, headingFont: null, bodyFont: null, photos: [], videos: [], narration: [], music: [], excluded: [] };
   for (const a of rows) {
     const meta = a.metadata ?? {};
@@ -35,6 +38,7 @@ export async function loadProductionAssets(tx: Tx, clientId: string): Promise<Pr
     if (!USABLE_RIGHTS.includes(a.rights_status)) { exclude(`direito de uso "${a.rights_status}"`); continue; }
     const consentOk = (scopes: string[]) => a.consent_id && !a.consent_revoked && scopes.includes(a.consent_scope);
     if (meta.has_person && (a.kind === "image" || a.kind === "video") && !consentOk(["image", "likeness"])) { exclude("mostra pessoa sem consentimento de imagem registrado"); continue; }
+    if (a.kind === "video" && meta.voice_of_person && !voiceConsent) { exclude("vídeo com voz de pessoa sem consentimento de voz registrado"); continue; }
     if (a.kind === "audio" && meta.voice_of_person && !consentOk(["voice"])) { exclude("voz de pessoa sem consentimento de voz registrado"); continue; }
     if (a.kind === "logo") { if (!out.logo || brand?.logo_asset_id === a.id) out.logo = a; continue; }
     if (a.kind === "font") { if (meta.role === "body") out.bodyFont = a; else out.headingFont = a; continue; }
