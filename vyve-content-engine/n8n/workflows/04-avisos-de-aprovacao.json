@@ -1,0 +1,231 @@
+{
+  "name": "VYVE · Avisar o que espera aprovação",
+  "nodes": [
+    {
+      "id": "67bc46b4-e784-4995-99a6-23a709544998",
+      "name": "De hora em hora",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "231b5a0f-83a0-4405-a3a5-e48452ecbbec",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7e7d9485-8b23-4815-8354-54ff6b1f4438",
+              "name": "base_url",
+              "value": "https://SEU-PAINEL-VYVE",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "df521b8e-0b33-4b5f-81b9-41370027ca2a",
+      "name": "Pendências",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VYVE_API",
+          "name": "VYVE API (Authorization: Bearer ...)"
+        }
+      },
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Config').item.json.base_url }}/api/v1/approvals",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 600000
+        }
+      }
+    },
+    {
+      "id": "ef19eca3-b9fd-4046-a990-31193e6c8d2b",
+      "name": "Tem pendência?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "329c8f05-cd56-4695-95f5-fe8f387d29a9",
+              "leftValue": "={{ $json.research.length + $json.scripts.length + $json.pieces.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "562ef852-3bc5-4f7d-a34e-afd4d8449b66",
+      "name": "Montar aviso",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        -80
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "edfa4418-ad46-43b3-a149-ec3454342189",
+              "name": "assunto",
+              "value": "={{ `VYVE: ${$json.research.length} pesquisa(s), ${$json.scripts.length} roteiro(s) e ${$json.pieces.length} peça(s) aguardando` }}",
+              "type": "string"
+            },
+            {
+              "id": "1ff23b62-30f8-4c7b-b81c-6a3a84e23661",
+              "name": "texto",
+              "value": "={{ [...$json.research.map(r => `Pesquisa · ${r.client} · ${r.title} · ${r.url}`), ...$json.scripts.map(s => `Roteiro · ${s.client} · ${s.title} · ${s.url}`), ...$json.pieces.map(p => `Peça · ${p.client} · ${p.title} · ${p.url}`)].join('\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "01a55b2b-4da4-4b84-95e3-dfc6b5fb33a1",
+      "name": "Enviar e-mail",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        -80
+      ],
+      "parameters": {
+        "fromEmail": "vyve@SEU-DOMINIO",
+        "toEmail": "equipe@SEU-DOMINIO",
+        "subject": "={{ $json.assunto }}",
+        "emailFormat": "text",
+        "text": "={{ $json.texto }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "a58e960e-32a3-4bad-9ee1-cd69feef87aa",
+      "name": "Leia-me",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -260
+      ],
+      "parameters": {
+        "content": "## Avisos de aprovação\nLista pesquisas, roteiros e peças esperando decisão e manda um resumo por e-mail com os links do painel.\nA chave de API **não aprova nada**: aprovar é sempre uma pessoa no painel.\nTroque o nó de e-mail por Slack/WhatsApp se preferir. Defina VYVE_PANEL_URL no servidor para os links saírem completos.",
+        "width": 520,
+        "height": 220
+      }
+    }
+  ],
+  "connections": {
+    "De hora em hora": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Pendências",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pendências": {
+      "main": [
+        [
+          {
+            "node": "Tem pendência?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tem pendência?": {
+      "main": [
+        [
+          {
+            "node": "Montar aviso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Montar aviso": {
+      "main": [
+        [
+          {
+            "node": "Enviar e-mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {}
+}

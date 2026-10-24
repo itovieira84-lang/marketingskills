@@ -1,0 +1,221 @@
+{
+  "name": "VYVE · Coletar métricas e analisar a semana",
+  "nodes": [
+    {
+      "id": "183b175c-d031-4ee8-9f0b-b855613d6309",
+      "name": "Todo dia 8h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "289ac056-a246-4fa1-8e35-d2b006065a98",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ed3d72df-8afa-497e-935b-9058888d7d5b",
+              "name": "base_url",
+              "value": "https://SEU-PAINEL-VYVE",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "0444465c-fc40-4ff8-92ad-7b78cdbedee3",
+      "name": "Coletar métricas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VYVE_API",
+          "name": "VYVE API (Authorization: Bearer ...)"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.base_url }}/api/v1/metrics/collect",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({}) }}",
+        "options": {
+          "timeout": 600000
+        }
+      }
+    },
+    {
+      "id": "d504ae2f-5068-4af1-9782-ddde49ac3e84",
+      "name": "Listar clientes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VYVE_API",
+          "name": "VYVE API (Authorization: Bearer ...)"
+        }
+      },
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Config').item.json.base_url }}/api/v1/clients",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 600000
+        }
+      }
+    },
+    {
+      "id": "19c84bcb-2815-46da-b36a-59240c054d64",
+      "name": "Um por cliente",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ],
+      "parameters": {
+        "fieldToSplitOut": "clients",
+        "options": {}
+      }
+    },
+    {
+      "id": "444dca42-198e-4947-a68c-27916ac69bea",
+      "name": "Analisar 7 dias",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VYVE_API",
+          "name": "VYVE API (Authorization: Bearer ...)"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.base_url }}/api/v1/analyze",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ clientId: $json.id }) }}",
+        "options": {
+          "timeout": 600000
+        }
+      }
+    },
+    {
+      "id": "3927f2a5-8808-4f17-83bd-871d01a83ae9",
+      "name": "Leia-me",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -260
+      ],
+      "parameters": {
+        "content": "## Métricas e análise\nColeta métricas reais pela API do Instagram (clientes sem token: nada é coletado) e gera o relatório dos últimos 7 dias por cliente.\nSem dados, o relatório diz \"sem métricas\" e não estima números. Os aprendizados voltam para a pesquisa do próximo lote.",
+        "width": 520,
+        "height": 220
+      }
+    }
+  ],
+  "connections": {
+    "Todo dia 8h": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Coletar métricas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coletar métricas": {
+      "main": [
+        [
+          {
+            "node": "Listar clientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar clientes": {
+      "main": [
+        [
+          {
+            "node": "Um por cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Um por cliente": {
+      "main": [
+        [
+          {
+            "node": "Analisar 7 dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {}
+}
